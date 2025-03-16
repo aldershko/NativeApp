@@ -10,22 +10,27 @@ import { useRouter } from "expo-router";
 import React from "react";
 import Colors from "@/constants/Colors";
 import auth from "../../config/FirebaseConfig";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
-
+import { SetLocalStorage } from "@/service/LocalStorage";
 const signUp = () => {
   const styles = signUpStyles();
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState("");
 
   const createUserAccount = () => {
     createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
         // Signed up
         const user = userCredential.user;
+        await updateProfile(user, {
+          displayName: userName,
+        });
         console.log(user);
+        await SetLocalStorage("userDetail", user);
         router.push("/(tabs)");
       })
       .catch((error) => {
@@ -64,7 +69,12 @@ const signUp = () => {
         >
           Fullname
         </Text>
-        <TextInput placeholder="Fullname" style={styles.input} />
+        <TextInput
+          placeholder="Fullname"
+          style={styles.input}
+          value={userName}
+          onChangeText={(text) => setUserName(text)}
+        />
       </View>
 
       <View style={{ marginTop: 5 }}>

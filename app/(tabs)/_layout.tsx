@@ -1,8 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-
+import { GetLocalStorage } from "../../service/LocalStorage";
+import { useRouter } from "expo-router";
 const TabLayout = () => {
+  const router = useRouter();
+
+  const getUser = async () => {
+    const userInfo = await GetLocalStorage("userDetail");
+
+    if (!userInfo) {
+      router.push("/login/signIn");
+    }
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
   return (
     <Tabs>
       <Tabs.Screen
